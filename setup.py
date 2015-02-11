@@ -4,5 +4,5 @@ setup(
     version = "0.01",
     description = "A simple Graph Database",
     author = "James Lee Vann",
-    py_modules = ['adharadb']
+    py_modules = ['adhara_db']
 )

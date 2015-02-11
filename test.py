@@ -2,7 +2,7 @@ import unittest
 import uuid
 import tempfile
 
-from adharadb import Graph
+from adhara_db import Graph
 
 class TestGraph(unittest.TestCase):
 
