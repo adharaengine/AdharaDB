@@ -94,7 +94,7 @@ class Graph():
             keys.append(self.add_edge(*edge))
         return keys
 
-    def neighbors(self, key):
+    def get_neighbors(self, key):
         '''
         key is a node key
         returns iterable of the neighbors of key

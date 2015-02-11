@@ -2,7 +2,7 @@ import unittest
 import uuid
 import tempfile
 
-from engine import Graph
+from adharadb import Graph
 
 class TestGraph(unittest.TestCase):
 
@@ -51,7 +51,7 @@ class TestGraph(unittest.TestCase):
         for e in edges:
             self.assertIsInstance(e, type(uuid.uuid4()))
 
-    def test_neighbors(self):
+    def test_get_neighbors(self):
         nodes = self.g.add_nodes(5)
         edge_list = []
         for idx, val in enumerate(nodes):
@@ -65,7 +65,7 @@ class TestGraph(unittest.TestCase):
         edges = self.g.add_edges(edge_list)
 
         for node in nodes:
-            for n in self.g.neighbors(node):
+            for n in self.g.get_neighbors(node):
                 self.assertIsInstance(n, type(uuid.uuid4()))
 
     def test_get_attributes(self):
