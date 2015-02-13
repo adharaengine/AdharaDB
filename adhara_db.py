@@ -15,7 +15,7 @@ class Graph():
         self.node_dict['attributes'] = {}
         self.node_dict['edges'] = {}
 
-    def add_node(self, attributes={}):
+    def add_node(self, attributes=None):
         '''
         Creates a node.
         A UUID is generated and it becomes the node
@@ -24,20 +24,24 @@ class Graph():
         Returns the node (UUID).
         '''
 
-        if not isinstance(attributes, dict):
-            raise ValueError('attributes must be a dict')
+        if not attributes:
+            attributes = {}
+
         key = uuid.uuid4()
         self.node_dict[key] = {}
         self.node_dict['attributes'][key] = attributes
         return key
 
-    def add_nodes(self, num, attributes={}):
+    def add_nodes(self, num, attributes=None):
         '''
         num is an int
         attributes is a dict of attributes to be applied to each node
         adds num nodes
         returns a list of the new nodes
         '''
+
+        if not attributes:
+            attributes = {}
 
         n = range(num)
         keys = []
@@ -64,12 +68,16 @@ class Graph():
         '''
         return self.node_dict['edges'].keys()
 
-    def add_edge(self, node1, node2, attributes={}):
+    def add_edge(self, node1, node2, attributes=None):
         '''
         Creates an edge between node1 and node2.
         attributes can be a dict of attributes to apply to the each edge
         returns the edge key (a UUID)
         '''
+
+        if not attributes:
+            attributes = {}
+
         if not isinstance(attributes, dict):
             raise ValueError('attributes must be a dict')
 
