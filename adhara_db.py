@@ -1,5 +1,5 @@
 
-import uuid, pickle, itertools
+import uuid, itertools
 
 class Graph():
     '''
@@ -144,18 +144,3 @@ class Graph():
             del self.node_dict[node][key]
         del self.node_dict['attributes'][key]
         del self.node_dict['edges'][key]
-
-    def export(self, file):
-        '''
-        File is a file object
-        Exports the graph representation to a file
-        '''
-        pickle.dump(self.node_dict, file, protocol=4)
-
-    def load(self, file):
-        '''
-        File is a file object
-        Loads a graph representation from file
-        '''
-
-        self.node_dict = pickle.load(file)

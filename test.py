@@ -108,21 +108,3 @@ class TestGraph(unittest.TestCase):
         for a in self.g.node_dict['attributes']:
             self.assertIn(e,[node,node2,node3,edge,edge3])
 
-    def test_export_load(self):
-        node = self.g.add_node({'keyn':'valuen'})
-        node2 = self.g.add_node({'keyn2':'valuen2'})
-        node3 = self.g.add_node({'keyn3':'valuen3'})
-        edge = self.g.add_edge(node,node2,{'keye':'valuee'})
-        edge2 = self.g.add_edge(node,node3,{'keye':'valuee'})
-        edge3 = self.g.add_edge(node2,node3)
-        #I really need to get this test to use a proper temp file
-        temp = open('temp.p','w+b')
-        self.g.export(temp)
-        temp.close()
-        self.g.del_edge(edge2)
-        self.g.del_node(node2)
-        temp = open('temp.p','r+b')
-        self.g.load(temp)
-        temp.close()
-        self.assertEqual(self.g.get_attributes(node2),{'keyn2':'valuen2'})
-        self.assertEqual(self.g.get_attributes(edge2),{'keye':'valuee'})
