@@ -3,6 +3,7 @@ import uuid
 import tempfile
 
 from adhara_db import Graph
+from backends.zodb import ZODBGraph
 
 class TestGraph(unittest.TestCase):
 
@@ -90,7 +91,7 @@ class TestGraph(unittest.TestCase):
         for n in self.g.nodes():
             self.assertEqual(n,node)
 
-        for a in self.g.node_dict['attributes']:
+        for a in self.g.attribute_store:
             self.assertEqual(a,node)
 
     def test_del_edge(self):
@@ -105,6 +106,22 @@ class TestGraph(unittest.TestCase):
         for e in self.g.edges():
             self.assertIn(e,[edge,edge3])
 
-        for a in self.g.node_dict['attributes']:
+        for a in self.g.attribute_store:
             self.assertIn(e,[node,node2,node3,edge,edge3])
 
+    def test_graph(self):
+        n1 = self.g.add_node()
+        n2 = self.g.add_node()
+        n3 = self.g.add_node()
+        e1 = self.g.add_edge(n1,n2)
+        e2 = self.g.add_edge(n1,n3)
+        self.assertIn(e1,self.g.edges())
+        self.assertIn(e2,self.g.edges())
+        self.assertIn(n2, self.g.get_neighbors(n1))
+        self.assertIn(n1, self.g.get_neighbors(n2))
+        self.assertIn(n3, self.g.get_neighbors(n1))
+
+class TestZODBGraph(TestGraph):
+
+    def setUp(self):
+        self.g = ZODBGraph()

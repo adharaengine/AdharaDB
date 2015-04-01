@@ -11,9 +11,9 @@ class Graph():
         we use an dict to store our adjacency lists
         see https://www.python.org/doc/essays/graphs/
         '''
-        self.node_dict = {}
-        self.node_dict['attributes'] = {}
-        self.node_dict['edges'] = {}
+        self.node_store = {}
+        self.attribute_store = {}
+        self.edge_store = {}
 
     def add_node(self, attributes=None):
         '''
@@ -28,8 +28,9 @@ class Graph():
             attributes = {}
 
         key = uuid.uuid4()
-        self.node_dict[key] = {}
-        self.node_dict['attributes'][key] = attributes
+        self.node_store[key] = {}
+        self.attribute_store[key] = attributes
+        self.commit()
         return key
 
     def add_nodes(self, num, attributes=None):
@@ -48,6 +49,7 @@ class Graph():
 
         for node in n:
             keys.append(self.add_node({'test':1,'key':'value'}))
+        self.commit()
         return keys
 
     def nodes(self):
@@ -59,14 +61,14 @@ class Graph():
         nodes = itertools.filterfalse(
             #lambda n: n == 'attributes' or 'edges',
             lambda n: False == isinstance(n, type(uuid.uuid4())),
-            self.node_dict.keys())
+            self.node_store.keys())
         return nodes
 
     def edges(self):
         '''
         returns an iterable of all the edges in the graph
         '''
-        return self.node_dict['edges'].keys()
+        return self.edge_store.keys()
 
     def add_edge(self, node1, node2, attributes=None):
         '''
@@ -82,11 +84,11 @@ class Graph():
             raise ValueError('attributes must be a dict')
 
         key = uuid.uuid4()
-        self.node_dict[node1][key] = node2
-        self.node_dict[node2][key] = node1
-        self.node_dict['attributes'][key] = attributes
-        self.node_dict['edges'][key] = (node1, node2)
-
+        self.node_store[node1][key] = node2
+        self.node_store[node2][key] = node1
+        self.attribute_store[key] = attributes
+        self.edge_store[key] = (node1, node2)
+        self.commit()
         return key
 
     def add_edges(self, edges):
@@ -100,6 +102,7 @@ class Graph():
         keys = []
         for edge in edges:
             keys.append(self.add_edge(*edge))
+        self.commit()
         return keys
 
     def get_neighbors(self, key):
@@ -107,21 +110,22 @@ class Graph():
         key is a node key
         returns iterable of the neighbors of key
         '''
-        return self.node_dict[key].values()
+        return self.node_store[key].values()
 
     def get_attributes(self, key):
         '''
         Takes key which is a node or edge and
         returns a dict of the node or edge attributes
         '''
-        return self.node_dict['attributes'][key]
+        return self.attribute_store[key]
 
     def add_attributes(self, key, **kwargs):
         '''
         key is a node or edge
         **kwargs are key=value attributes to apply to key
         '''
-        self.node_dict['attributes'][key].update(kwargs)
+        self.commit()
+        self.attribute_store[key].update(kwargs)
 
     def del_node(self, key):
         '''
@@ -130,17 +134,33 @@ class Graph():
         '''
         #Note: Must create shallow copy here with copy() method
         #because we are altering the attributes dict within the node_dict
-        for edge in self.node_dict[key].copy():
+        for edge in self.node_store[key].copy():
             self.del_edge(edge)
-        del self.node_dict[key]
-        del self.node_dict['attributes'][key]
+        del self.node_store[key]
+        del self.attribute_store[key]
+        self.commit()
 
     def del_edge(self, key):
         '''
         key is an edge key
         deletes the edge represented by key
         '''
-        for node in self.node_dict['edges'][key]:
-            del self.node_dict[node][key]
-        del self.node_dict['attributes'][key]
-        del self.node_dict['edges'][key]
+        for node in self.edge_store[key]:
+            del self.node_store[node][key]
+        del self.attribute_store[key]
+        del self.edge_store[key]
+        self.commit()
+
+    def commit(self):
+        '''
+        Provides a hook for Transactional capable storage engines
+        Over-ride this method to perform a proper commit
+        '''
+        pass
+
+    def abort(self):
+        '''
+        Provides a hook for Transactional capable storage engines
+        Over-ride this method to abort a transaction
+        '''
+        pass
