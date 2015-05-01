@@ -23,7 +23,7 @@ class TestGraph(unittest.TestCase):
 
     def test_nodes(self):
         self.g.add_nodes(5)
-        for n in self.g.nodes():
+        for n in self.g.nodes:
             self.assertIsInstance(n, type(uuid.uuid4()))
 
     def test_edges(self):
@@ -33,7 +33,7 @@ class TestGraph(unittest.TestCase):
                 self.g.add_edge(val,nodes[idx+1])
             except IndexError:
                 pass
-        for e in self.g.edges():
+        for e in self.g.edges:
             self.assertIsInstance(e, type(uuid.uuid4()))
 
     def test_add_edges(self):
@@ -74,21 +74,21 @@ class TestGraph(unittest.TestCase):
         node2 = self.g.add_node({'keyn2':'valuen2'})
         edge = self.g.add_edge(node,node2,{'keye':'valuee'})
 
-        self.assertEqual(self.g.get_attributes(node),{'keyn':'valuen'})
-        self.assertEqual(self.g.get_attributes(node2),{'keyn2':'valuen2'})
-        self.assertEqual(self.g.get_attributes(edge),{'keye':'valuee'})
+        self.assertEqual(self.g[node],{'keyn':'valuen'})
+        self.assertEqual(self.g[node2],{'keyn2':'valuen2'})
+        self.assertEqual(self.g[edge],{'keye':'valuee'})
 
     def test_add_attributes(self):
         node = self.g.add_node({'keyn':'valuen'})
-        self.g.add_attributes(node,keyn2='valuen2')
-        self.assertEqual(self.g.get_attributes(node),
-                                            {'keyn':'valuen','keyn2':'valuen2'})
+        self.g[node] = {'keyn2':'valuen2'}
+        self.assertEqual(self.g[node], {'keyn':'valuen','keyn2':'valuen2'})
+
     def test_del_node(self):
         node = self.g.add_node({'keyn':'valuen'})
         node2 = self.g.add_node({'keyn2':'valuen2'})
         self.g.del_node(node2)
 
-        for n in self.g.nodes():
+        for n in self.g.nodes:
             self.assertEqual(n,node)
 
         for a in self.g.attribute_store:
@@ -103,7 +103,7 @@ class TestGraph(unittest.TestCase):
         edge3 = self.g.add_edge(node2,node3)
         self.g.del_edge(edge2)
 
-        for e in self.g.edges():
+        for e in self.g.edges:
             self.assertIn(e,[edge,edge3])
 
         for a in self.g.attribute_store:
@@ -115,8 +115,8 @@ class TestGraph(unittest.TestCase):
         n3 = self.g.add_node()
         e1 = self.g.add_edge(n1,n2)
         e2 = self.g.add_edge(n1,n3)
-        self.assertIn(e1,self.g.edges())
-        self.assertIn(e2,self.g.edges())
+        self.assertIn(e1,self.g.edges)
+        self.assertIn(e2,self.g.edges)
         self.assertIn(n2, self.g.get_neighbors(n1))
         self.assertIn(n1, self.g.get_neighbors(n2))
         self.assertIn(n3, self.g.get_neighbors(n1))

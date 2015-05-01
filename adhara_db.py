@@ -1,10 +1,11 @@
 
-import uuid, itertools
+import uuid
 
 class Graph():
     '''
     A base graph object.
     '''
+#To Do: Make more methods into properties.
 
     def __init__(self):
         '''
@@ -14,6 +15,47 @@ class Graph():
         self.node_store = {}
         self.attribute_store = {}
         self.edge_store = {}
+
+
+    def __iter__(self):
+        '''
+        By iterating over our graph, we get both nodes and edges.
+        To get just nodes or edges, use the nodes or edges properties.
+        '''
+
+        return self.attribute_store.keys()
+
+
+    def __getitem__(self, key):
+        '''
+        Retrieves the attribute dictionary of the node or edge represented by key
+        '''
+        return self.attribute_store[key]
+
+    def __setitem__(self, key, item):
+        '''
+        Set an attributes for a node or edge.  ::item:: should be a dictionary
+        '''
+        self.attribute_store[key].update(item)
+        self.commit()
+
+        return self.attribute_store[key]
+
+
+    @property
+    def nodes(self):
+        '''
+        Returns an iterable of all the nodes in the graph
+        '''
+        return self.node_store.keys()
+
+    @property
+    def edges(self):
+        '''
+        returns an iterable of all the edges in the graph
+        '''
+        return self.edge_store.keys()
+
 
     def add_node(self, attributes=None):
         '''
@@ -52,23 +94,6 @@ class Graph():
         self.commit()
         return keys
 
-    def nodes(self):
-        '''
-        Returns an iterable of all the nodes in the graph
-        '''
-        #We don't want to return 'edges' and 'attributes',
-        #as they are not in fact nodes
-        nodes = itertools.filterfalse(
-            #lambda n: n == 'attributes' or 'edges',
-            lambda n: False == isinstance(n, type(uuid.uuid4())),
-            self.node_store.keys())
-        return nodes
-
-    def edges(self):
-        '''
-        returns an iterable of all the edges in the graph
-        '''
-        return self.edge_store.keys()
 
     def add_edge(self, node1, node2, attributes=None):
         '''
@@ -112,20 +137,6 @@ class Graph():
         '''
         return self.node_store[key].values()
 
-    def get_attributes(self, key):
-        '''
-        Takes key which is a node or edge and
-        returns a dict of the node or edge attributes
-        '''
-        return self.attribute_store[key]
-
-    def add_attributes(self, key, **kwargs):
-        '''
-        key is a node or edge
-        **kwargs are key=value attributes to apply to key
-        '''
-        self.commit()
-        self.attribute_store[key].update(kwargs)
 
     def del_node(self, key):
         '''
