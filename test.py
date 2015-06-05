@@ -2,7 +2,7 @@ import unittest
 import tempfile
 
 from adhara_db import Graph, Element, Edge, Node
-from backends.zodb import ZODBGraph
+from backends.zodb import ZODBBTreeBackend
 
 class TestGraph(unittest.TestCase):
 
@@ -22,7 +22,7 @@ class TestGraph(unittest.TestCase):
     def test_getersetter_(self):
         node = self.g.add_node({'keyn':'valuen'})
         self.g[node] = {'keyn2':'valuen2'}
-        self.assertEqual(self.g[node], {'keyn':'valuen','keyn2':'valuen2'})   
+        self.assertEqual(self.g[node], {'keyn':'valuen','keyn2':'valuen2'})
 
     def test_add_node(self):
         n = self.g.add_node()
@@ -88,10 +88,8 @@ class TestGraph(unittest.TestCase):
         node = self.g.add_node({'keyn':'valuen'})
         node2 = self.g.add_node({'keyn2':'valuen2'})
         self.g.del_node(node2)
-
         for n in self.g.nodes:
             self.assertEqual(n,node)
-
         for a in self.g.attribute_store:
             self.assertEqual(a,node)
 
@@ -122,13 +120,13 @@ class TestGraph(unittest.TestCase):
         self.assertIn(n1, n2.neighbors)
         self.assertIn(n3, n1.neighbors)
 
-class TestZODBGraph(TestGraph):
+class TestZODBBTreeBackend(TestGraph):
 
     def setUp(self):
-        self.g = ZODBGraph()
+        self.g = Graph(backend=ZODBBTreeBackend)
 
 class TestElement(unittest.TestCase):
-    
+
     def setUp(self):
         self.g = Graph()
 
@@ -149,7 +147,7 @@ class TestElement(unittest.TestCase):
     def test_lt_gt_le_ge_(self):
         e = Element(self.g)
         e2 = Element(self.g)
-        
+
         #we don't know wether e2 will be less or greater than e, so test is limited
         if e > e2:
             pass
@@ -162,7 +160,7 @@ class TestElement(unittest.TestCase):
 
     def test_hash_(self):
         e = Element(self.g)
-        e2 = Element(self.g)     
+        e2 = Element(self.g)
         self.assertTrue(e.__hash__() != e2.__hash__())
 
     def test_int_(self):
@@ -171,7 +169,7 @@ class TestElement(unittest.TestCase):
 
     def test_repr_(self):
         e = Element(self.g)
-        self.assertIsInstance(e.__repr__(), str)  
+        self.assertIsInstance(e.__repr__(), str)
 
     def test_setattr_(self):
         e = Element(self.g)
@@ -183,7 +181,7 @@ class TestElement(unittest.TestCase):
         self.assertIsInstance(str(e), str)
 
 class TestNode(TestElement):
-    
+
     def test_delete(self):
         n = self.g.add_node()
         n.delete()
@@ -221,7 +219,7 @@ class TestNode(TestElement):
         self.assertEqual(node['keyn2'],'valuen2')
 
 class TestEdge(TestElement):
-    
+
     def test_delete(self):
         n1 = self.g.add_node()
         n2 = self.g.add_node()
@@ -233,14 +231,14 @@ class TestEdge(TestElement):
         nodes = self.g.add_nodes(2)
         e1 = self.g.add_edge(nodes[0], nodes[1])
         for n in e1.nodes:
-            self.assertIsInstance(n, Node)  
+            self.assertIsInstance(n, Node)
             self.assertIn(n, nodes)
 
     def test_iter_(self):
         nodes = self.g.add_nodes(2)
         e1 = self.g.add_edge(nodes[0], nodes[1])
         for n in e1:
-            self.assertIsInstance(n, Node)  
+            self.assertIsInstance(n, Node)
             self.assertIn(n, nodes)
 
     def test_getitem_setitem_(self):
@@ -248,15 +246,3 @@ class TestEdge(TestElement):
         e1 = self.g.add_edge(nodes[0], nodes[1])
         e1['key2'] = 'value2'
         self.assertEqual(e1['key2'],'value2')
-
-
-        
-        
-
-
-        
-        
-
-
-                
-

@@ -4,10 +4,8 @@ from ZODB import FileStorage, DB
 from BTrees import OOBTree
 import transaction
 
-from adhara_db import Graph
 
-
-class ZODBGraph(Graph):
+class ZODBBTreeBackend():
     '''
     A ZODB backed graph object.
     '''
@@ -35,7 +33,7 @@ class ZODBGraph(Graph):
     def commit(self):
         '''Simply commits the transaction'''
         transaction.commit()
-        
+
     def abort(self):
         '''Simply aborts the transaction'''
         transaction.abort()

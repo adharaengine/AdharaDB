@@ -1,20 +1,27 @@
 
 import uuid, itertools
 
+from backends.in_memory import DictionaryBackend
+
 class Graph():
     '''
-    A base graph object.
+    A graph object.
+    backend is a backend class
     '''
 #To Do: Make more methods into properties.
 
-    def __init__(self):
+    def __init__(self, backend=DictionaryBackend):
         '''
-        we use an dict to store our adjacency lists
-        see https://www.python.org/doc/essays/graphs/
+        We setup our graph object to use the storage backend
         '''
-        self.node_store = {}
-        self.attribute_store = {}
-        self.edge_store = {}
+        #we have to create our backend object
+        backend = backend()
+
+        self.node_store = backend.node_store
+        self.attribute_store = backend.attribute_store
+        self.edge_store = backend.edge_store
+        self.commit_func = backend.commit
+        self.abort_func = backend.abort
 
 
     def __iter__(self):
@@ -155,17 +162,15 @@ class Graph():
 
     def commit(self):
         '''
-        Provides a hook for Transactional capable storage engines
-        Over-ride this method to perform a proper commit
+        Calls the backend commit method (if supported)
         '''
-        pass
+        self.commit_func
 
     def abort(self):
         '''
-        Provides a hook for Transactional capable storage engines
-        Over-ride this method to abort a transaction
+        calls the backend abort function (if supported)
         '''
-        pass
+        self.abort_func
 
 
 class Element():
