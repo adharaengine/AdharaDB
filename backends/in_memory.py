@@ -1,5 +1,3 @@
-
-
 class DictionaryBackend():
     '''
     we use an dict to store our adjacency lists
@@ -10,10 +8,12 @@ class DictionaryBackend():
         '''
         We store our data in a dictionary
         '''
-
+        super().__init__()
         self.node_store = {}
         self.attribute_store = {}
         self.edge_store = {}
+        self.weight_store = {}
+        self.direction_store = []
 
     def commit(self):
         '''Simply commits the transaction'''

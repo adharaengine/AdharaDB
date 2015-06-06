@@ -3,6 +3,8 @@ import tempfile
 
 from adhara_db import Graph, Element, Edge, Node
 from backends.zodb import ZODBBTreeBackend
+from weighted_graph import WeightedGraph, WeightedElement, WeightedNode, WeightedEdge
+
 
 class TestGraph(unittest.TestCase):
 
@@ -31,7 +33,6 @@ class TestGraph(unittest.TestCase):
             self.assertIsInstance(node, Element)
         self.assertIn(n, self.g.nodes)
 
-
     def test_add_nodes(self):
         nodes = self.g.add_nodes(4)
         self.assertIsInstance(nodes,list)
@@ -44,7 +45,7 @@ class TestGraph(unittest.TestCase):
         for n in self.g.nodes:
             self.assertIsInstance(n, Element)
 
-    def test_edges(self):
+    def test_add_edge(self):
         nodes = self.g.add_nodes(5)
         for idx, val in enumerate(nodes):
             try:
@@ -53,6 +54,18 @@ class TestGraph(unittest.TestCase):
                 pass
         for e in self.g.edges:
             self.assertIsInstance(e, Element)
+            self.assertFalse(e.directed)
+
+    def test_add_directed_edge(self):
+        nodes = self.g.add_nodes(5)
+        for idx, val in enumerate(nodes):
+            try:
+                self.g.add_edge(val,nodes[idx+1],directed=True)
+            except IndexError:
+                pass
+        for e in self.g.edges:
+            self.assertIsInstance(e, Element)
+            self.assertTrue(e.directed)
 
     def test_add_edges(self):
         nodes = self.g.add_nodes(5)
@@ -163,10 +176,6 @@ class TestElement(unittest.TestCase):
         e2 = Element(self.g)
         self.assertTrue(e.__hash__() != e2.__hash__())
 
-    def test_int_(self):
-        e = Element(self.g)
-        self.assertIsInstance(int(e), int)
-
     def test_repr_(self):
         e = Element(self.g)
         self.assertIsInstance(e.__repr__(), str)
@@ -246,3 +255,32 @@ class TestEdge(TestElement):
         e1 = self.g.add_edge(nodes[0], nodes[1])
         e1['key2'] = 'value2'
         self.assertEqual(e1['key2'],'value2')
+
+class TestWeightedGraph(TestGraph):
+
+    def setUp(self):
+        self.g = WeightedGraph()
+
+    def test_add_weighted_node(self):
+        n = self.g.add_node(weight=7)
+        self.assertIsInstance(n, Element)
+        for node in self.g.nodes:
+            self.assertIsInstance(node, Element)
+        self.assertIn(n, self.g.nodes)
+        self.assertEqual(n.weight, 7)
+
+class TestWeightedElement(TestElement):
+
+    def setUp(self):
+        self.g = WeightedGraph()
+
+    def test_weight(self):
+        e = WeightedElement(self.g)
+        e.weight = 9
+        self.assertEqual(e.weight, 9)
+
+
+class TestWeightedNode(TestNode):
+
+    def setUp(self):
+        self.g = WeightedGraph()

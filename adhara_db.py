@@ -15,13 +15,17 @@ class Graph():
         We setup our graph object to use the storage backend
         '''
         #we have to create our backend object
-        backend = backend()
+        self.backend = backend()
 
-        self.node_store = backend.node_store
-        self.attribute_store = backend.attribute_store
-        self.edge_store = backend.edge_store
-        self.commit_func = backend.commit
-        self.abort_func = backend.abort
+        self.node_store = self.backend.node_store
+        self.attribute_store = self.backend.attribute_store
+        self.edge_store = self.backend.edge_store
+        self.commit_func = self.backend.commit
+        self.abort_func = self.backend.abort
+        self.direction_store = self.backend.direction_store
+        #the default node and edge types
+        self.node_type = Node
+        self.edge_type = Edge
 
 
     def __iter__(self):
@@ -64,7 +68,7 @@ class Graph():
         return self.edge_store.keys()
 
 
-    def add_node(self, attributes=None):
+    def add_node(self, attributes=None, *args, **kwargs):
         '''
         Creates a node.
         A UUID is generated and it becomes the node
@@ -76,13 +80,13 @@ class Graph():
         if not attributes:
             attributes = {}
 
-        node = Node(self)
+        node = self.node_type(self)
         self.node_store[node] = {}
         self.attribute_store[node] = attributes
         self.commit()
         return node
 
-    def add_nodes(self, num, attributes=None):
+    def add_nodes(self, num, attributes=None, *args, **kwargs):
         '''
         num is an int
         attributes is a dict of attributes to be applied to each node
@@ -93,16 +97,15 @@ class Graph():
         if not attributes:
             attributes = {}
 
-        n = range(num)
         nodes = []
 
-        for node in n:
-            nodes.append(self.add_node({'test':1,'key':'value'}))
+        for node in range(num):
+            nodes.append(self.add_node({'test':1,'key':'value'}, *args, **kwargs))
         self.commit()
         return nodes
 
 
-    def add_edge(self, node1, node2, attributes=None):
+    def add_edge(self, node1, node2, attributes=None, directed=False, *args, **kwargs):
         '''
         Creates an edge between node1 and node2.
         attributes can be a dict of attributes to apply to the each edge
@@ -115,9 +118,12 @@ class Graph():
         if not isinstance(attributes, dict):
             raise ValueError('attributes must be a dict')
 
-        edge = Edge(self)
+        edge = self.edge_type(self)
         self.node_store[node1][edge] = node2
-        self.node_store[node2][edge] = node1
+        if directed:
+            self.direction_store.append(edge)
+        else:
+            self.node_store[node2][edge] = node1
         self.attribute_store[edge] = attributes
         self.edge_store[edge] = (node1, node2)
         self.commit()
@@ -198,57 +204,54 @@ class Element():
 
     def __eq__(self, other):
         try:
-            return int(self) == other
+            return self.id == other.id
         except ValueError:
-            raise NotImplemented
+            return NotImplemented
         except TypeError:
-            raise NotImplemented
+            return NotImplemented
 
     def __ne__(self, other):
         try:
-            return int(self) != other
+            return self.id != other.id
         except ValueError:
-            raise NotImplemented
+            return NotImplemented
         except TypeError:
-            raise NotImplemented
+            return NotImplemented
 
     def __lt__(self, other):
         try:
-            return int(self) < other
+            return self.id < other.id
         except ValueError:
-            raise NotImplemented
+            return NotImplemented
         except TypeError:
-            raise NotImplemented
+            return NotImplemented
 
     def __gt__(self, other):
         try:
-            return int(self) > other
+            return self.id > other.id
         except ValueError:
-            raise NotImplemented
+            return NotImplemented
         except TypeError:
-            raise NotImplemented
+            return NotImplemented
 
     def __le__(self, other):
         try:
-            return int(self) <= other
+            return self.id <= other.id
         except ValueError:
-            raise NotImplemented
+            return NotImplemented
         except TypeError:
-            raise NotImplemented
+            return NotImplemented
 
     def __ge__(self, other):
         try:
-            return int(self) >= other
+            return self.id >= other.id
         except ValueError:
-            raise NotImplemented
+            return NotImplemented
         except TypeError:
-            raise NotImplemented
+            return NotImplemented
 
     def __hash__(self):
         return self.id.__hash__()
-
-    def __int__(self):
-        return self.id.__int__()
 
     def __repr__(self):
         return 'Element(%r)' % str(self)
@@ -310,6 +313,13 @@ class Edge(Element):
     @property
     def nodes(self):
         return self.graph.edge_store[self]
+
+    @property
+    def directed(self):
+        if self in self.graph.direction_store:
+            return True
+        else:
+            return False
 
     def __iter__(self):
         '''
