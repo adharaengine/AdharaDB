@@ -5,7 +5,7 @@ from tempfile import NamedTemporaryFile
 from ZODB import DB, config
 from ZODB.FileStorage import FileStorage
 
-from adhara_db import Graph, Element, Edge, Node
+from db import Graph, Element, Edge, Node
 from weighted_graph import WeightedGraph, WeightedElement, WeightedNode, WeightedEdge
 from backends import DictionaryBackend, ZODBBTreeBackend
 

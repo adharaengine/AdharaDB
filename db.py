@@ -1,4 +1,3 @@
-
 import uuid, itertools
 
 class Graph():

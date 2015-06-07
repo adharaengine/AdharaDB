@@ -1,4 +1,4 @@
-from adhara_db import Graph, Element, Node, Edge
+from db import Graph, Element, Node, Edge
 
 class WeightedGraph(Graph):
     '''
