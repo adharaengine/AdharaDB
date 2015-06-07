@@ -7,7 +7,7 @@ class WeightedGraph(Graph):
     we also store weights for nodes!
     '''
     def __init__(self, *args, **kwargs):
-        super().__init__()
+        super().__init__(*args, **kwargs)
 
         self.weight_store = self.backend.weight_store
         self.node_type = WeightedNode

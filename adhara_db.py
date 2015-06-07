@@ -1,8 +1,6 @@
 
 import uuid, itertools
 
-from backends.in_memory import DictionaryBackend
-
 class Graph():
     '''
     A graph object.
@@ -10,19 +8,17 @@ class Graph():
     '''
 #To Do: Make more methods into properties.
 
-    def __init__(self, backend=DictionaryBackend):
+    def __init__(self, backend):
         '''
         We setup our graph object to use the storage backend
         '''
-        #we have to create our backend object
-        self.backend = backend()
-
-        self.node_store = self.backend.node_store
-        self.attribute_store = self.backend.attribute_store
-        self.edge_store = self.backend.edge_store
-        self.commit_func = self.backend.commit
-        self.abort_func = self.backend.abort
-        self.direction_store = self.backend.direction_store
+        self.backend = backend
+        self.node_store = backend.node_store
+        self.attribute_store = backend.attribute_store
+        self.edge_store = backend.edge_store
+        self.commit_func = backend.commit
+        self.abort_func = backend.abort
+        self.direction_store = backend.direction_store
         #the default node and edge types
         self.node_type = Node
         self.edge_type = Edge

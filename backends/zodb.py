@@ -1,4 +1,3 @@
-from ZODB import FileStorage, DB
 from BTrees import OOBTree
 import transaction
 
@@ -8,19 +7,10 @@ class ZODBBTreeBackend():
     A ZODB backed graph object.
     '''
 
-    def __init__(self, storage=None, path=None):
+    def __init__(self, root):
         '''
         We store our data in a ZODB database, using BTrees
         '''
-        super().__init__()
-        if storage:
-            db = DB(storage(path))
-        else:
-            db = DB(path)
-
-        connection = db.open()
-        root = connection.root
-
         root.node_store = OOBTree.BTree()
         root.attribute_store = OOBTree.BTree()
         root.edge_store = OOBTree.BTree()
@@ -40,6 +30,7 @@ class ZODBBTreeBackend():
     def abort(self):
         '''Simply aborts the transaction'''
         transaction.abort()
+
 
 class TreeSet(OOBTree.TreeSet):
     '''

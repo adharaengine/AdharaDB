@@ -8,7 +8,7 @@ class DictionaryBackend():
         '''
         We store our data in a dictionary
         '''
-        super().__init__()
+        
         self.node_store = {}
         self.attribute_store = {}
         self.edge_store = {}
