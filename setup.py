@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 setup(
     name = "AdharaDB",
     version = "0.02",
-    description = "A simple Graph Database",
+    description = "A simple Graph Processing System",
     author = "James Lee Vann",
     py_modules = ['adhara_db']
     extras_require = {
