@@ -1,10 +1,10 @@
 from setuptools import setup, find_packages
 setup(
-    name = "AdharaDB",
-    version = "0.02",
+    name = "AdharaGraph",
+    version = "0.03",
     description = "A simple Graph Processing System",
     author = "James Lee Vann",
-    py_modules = ['adhara_db']
+    py_modules = ['db', 'backends', 'weighted_graph'],
     extras_require = {
         'ZODB Storage':  ["ZODB"],
     }
