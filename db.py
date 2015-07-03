@@ -29,6 +29,7 @@ class Graph():
         self.node_store = backend.node_store
         self.attribute_store = backend.attribute_store
         self.edge_store = backend.edge_store
+        self.weight_store = backend.weight_store
         self.commit_func = backend.commit
         self.abort_func = backend.abort
         self.direction_store = backend.direction_store
@@ -98,12 +99,13 @@ class Graph():
         return self.edge_store.keys()
 
 
-    def add_node(self, attributes=None, *args, **kwargs):
+    def add_node(self, attributes=None, weight=0, *args, **kwargs):
         """
         Create a node in the graph
 
         Args:
             attributes (optional): is an optional dict with attributes to assign to the node
+            weight (optional): an integer specifying the nodes weight, defaults to 0
 
         Returns:
             the node object
@@ -115,6 +117,7 @@ class Graph():
         node = self.node_type(self)
         self.node_store[node] = {}
         self.attribute_store[node] = attributes
+        self.weight_store[node] = weight
         self.commit()
         return node
 
@@ -146,7 +149,7 @@ class Graph():
         return nodes
 
 
-    def add_edge(self, node1, node2, attributes=None, directed=False, *args, **kwargs):
+    def add_edge(self, node1, node2, attributes=None, directed=False, weight=0, *args, **kwargs):
         """
         Creates an edge between node1 and node2.
 
@@ -154,6 +157,8 @@ class Graph():
             node1: A node object
             node2: Another node object
             attributes (optional): dictionary of attributes to apply to the edge
+            directed (optional): Boolean value, to create a directional edge,set True (False by default)
+            weight (optional): an integer representing the edges initial weight
 
         Keyword Args:
             directional: Boolean value, to create a directional edge, you supply
@@ -179,6 +184,7 @@ class Graph():
             self.node_store[node2][edge] = node1
         self.attribute_store[edge] = attributes.copy()
         self.edge_store[edge] = (node1, node2)
+        self.weight_store[edge] = weight
         self.commit()
         return edge
 
@@ -270,6 +276,16 @@ class Element():
         self.__dict__['graph'] = graph
         self.__dict__['id'] = id
 
+    def __setattr__(self, name, value):
+        if name == 'weight':
+            self.graph.weight_store[self] = value
+        else:
+            raise TypeError("'" + self.__class__.__name__ + "' objects are immutable")
+
+    @property
+    def weight(self):
+        return self.graph.weight_store.get(self)
+
     def __eq__(self, other):
 
         try:
@@ -331,10 +347,6 @@ class Element():
     def __repr__(self):
 
         return 'Element(%r)' % str(self)
-
-    def __setattr__(self, name, value):
-
-        raise TypeError("'" + self.__class__.__name__ + "' objects are immutable")
 
     def __str__(self):
 

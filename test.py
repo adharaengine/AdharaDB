@@ -6,7 +6,6 @@ from ZODB import DB, config
 from ZODB.FileStorage import FileStorage
 
 from db import Graph, Element, Edge, Node
-from weighted_graph import WeightedGraph, WeightedElement, WeightedNode, WeightedEdge
 from backends import DictionaryBackend, ZODBBTreeBackend
 
 
@@ -137,6 +136,14 @@ class TestGraph(unittest.TestCase):
         self.assertIn(n1, n2.neighbors)
         self.assertIn(n3, n1.neighbors)
 
+    def test_add_weighted_node(self):
+        n = self.g.add_node(weight=7)
+        self.assertIsInstance(n, Element)
+        for node in self.g.nodes:
+            self.assertIsInstance(node, Element)
+        self.assertIn(n, self.g.nodes)
+        self.assertEqual(n.weight, 7)
+
 class TestGraphZODB(TestGraph):
 
     def setUp(self):
@@ -198,6 +205,11 @@ class TestElement(unittest.TestCase):
         e = Element(self.g)
         self.assertIsInstance(str(e), str)
 
+    def test_weight(self):
+        e = Element(self.g)
+        e.weight = 9
+        self.assertEqual(e.weight, 9)
+
 class TestElementZODB(TestElement):
 
     def setUp(self):
@@ -206,6 +218,8 @@ class TestElementZODB(TestElement):
         connection = db.open()
         root = connection.root
         self.g = Graph(backend=ZODBBTreeBackend(root))
+
+
 
 class TestNode(TestElement):
 
@@ -244,6 +258,8 @@ class TestNode(TestElement):
         node['keyn2'] = 'valuen2'
         self.assertEqual(node['keyn'],'valuen')
         self.assertEqual(node['keyn2'],'valuen2')
+
+
 
 class TestNodeZODB(TestNode):
 
@@ -291,66 +307,3 @@ class TestEdgeZODB(TestEdge):
         connection = db.open()
         root = connection.root
         self.g = Graph(backend=ZODBBTreeBackend(root))
-
-class TestWeightedGraph(TestGraph):
-
-    def setUp(self):
-        self.g = WeightedGraph(DictionaryBackend())
-
-    def test_add_weighted_node(self):
-        n = self.g.add_node(weight=7)
-        self.assertIsInstance(n, Element)
-        for node in self.g.nodes:
-            self.assertIsInstance(node, Element)
-        self.assertIn(n, self.g.nodes)
-        self.assertEqual(n.weight, 7)
-
-class TestWeightedGraphZODB(TestWeightedGraph):
-
-    def setUp(self):
-        storage = FileStorage(NamedTemporaryFile().name)
-        db = DB(storage)
-        connection = db.open()
-        root = connection.root
-        self.g = WeightedGraph(backend=ZODBBTreeBackend(root))
-
-
-class TestWeightedElement(TestElement):
-
-    def setUp(self):
-        self.g = WeightedGraph(DictionaryBackend())
-
-    def test_weight(self):
-        e = WeightedElement(self.g)
-        e.weight = 9
-        self.assertEqual(e.weight, 9)
-
-class TestWeightedElementZODB(TestWeightedElement):
-
-    def setUp(self):
-
-        storage = FileStorage(NamedTemporaryFile().name)
-        db = DB(storage)
-        connection = db.open()
-        root = connection.root
-        self.g = WeightedGraph(backend=ZODBBTreeBackend(root))
-
-    def test_weight(self):
-        e = WeightedElement(self.g)
-        e.weight = 9
-        self.assertEqual(e.weight, 9)
-
-class TestWeightedNode(TestNode):
-
-    def setUp(self):
-        self.g = WeightedGraph(DictionaryBackend())
-
-class TestWeightedNodeZODB(TestWeightedNode):
-
-    def setUp(self):
-
-        storage = FileStorage(NamedTemporaryFile().name)
-        db = DB(storage)
-        connection = db.open()
-        root = connection.root
-        self.g = WeightedGraph(backend=ZODBBTreeBackend(root))
